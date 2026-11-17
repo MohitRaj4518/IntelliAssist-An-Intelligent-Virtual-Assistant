@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-banner">
+  <div class="hero-tag">🎓 B.Tech AI Lab Mini-Project Submission</div>
+  <h2 class="hero-title">{{ project_title }}</h2>
+  <p class="hero-desc">
+    An academic-grade interactive artificial intelligence platform and virtual assistant demonstrating 
+    <strong>13 classical AI algorithms</strong> across uninformed search, informed heuristics, game-theoretic logic, 
+    classical puzzles, optimization metaheuristics, and probabilistic machine learning models.
+  </p>
+  <div class="hero-actions">
+    <a href="/algorithms" class="btn-pill btn-primary">⚡ Launch Algorithm Lab</a>
+    <a href="/puzzles" class="btn-pill">🧩 Play Classical Puzzles</a>
+    <a href="/chatbot" class="btn-pill">🎙️ Talk to Virtual Assistant</a>
+    <a href="/learning" class="btn-pill">📖 View Theory & Viva Q&A</a>
+  </div>
+</div>
+
+<!-- Metrics Stats Grid -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon purple">🧠</div>
+    <div>
+      <div class="stat-val">13</div>
+      <div class="stat-label">Total AI Algorithms</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon cyan">📑</div>
+    <div>
+      <div class="stat-val">4</div>
+      <div class="stat-label">Syllabus Groups Covered</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon emerald">📊</div>
+    <div>
+      <div class="stat-val">100%</div>
+      <div class="stat-label">Interactive Visualizers</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon amber">🤖</div>
+    <div>
+      <div class="stat-val">Voice + NLP</div>
+      <div class="stat-label">Virtual Assistant Engine</div>
+    </div>
+  </div>
+</div>
+
+<!-- Syllabus Groups Breakdown -->
+<div class="section-header">
+  <h3>📚 Artificial Intelligence Lab Syllabus Coverage</h3>
+  <span style="font-size:0.85rem; color:var(--text-muted);">Strictly aligned with university AI lab curriculum</span>
+</div>
+
+<div class="groups-grid">
+  <!-- Group 1 -->
+  <div class="group-card">
+    <span class="group-badge badge-1">GROUP 1</span>
+    <h4>Search & Optimization</h4>
+    <p>Exhaustive and stochastic search strategies evaluating tree exploration, queue mechanisms, and metallurgical cooling analogy.</p>
+    <div class="algo-pill-list">
+      <a href="/algorithms?id=dfs" class="algo-pill">1. Depth First Search (DFS)</a>
+      <a href="/algorithms?id=bfs" class="algo-pill">2. Breadth First Search (BFS)</a>
+      <a href="/algorithms?id=ids" class="algo-pill">3. Iterative Deepening Search (IDS)</a>
+      <a href="/algorithms?id=simulated_annealing" class="algo-pill">4. Simulated Annealing</a>
+    </div>
+    <a href="/algorithms?id=bfs" class="btn-pill" style="margin-top:auto; font-size:0.8rem;">Explore Group 1 →</a>
+  </div>
+
+  <!-- Group 2 -->
+  <div class="group-card">
+    <span class="group-badge badge-2">GROUP 2</span>
+    <h4>Classical AI Problems</h4>
+    <p>Benchmark state-space reasoning problems testing proposition logic, Manhattan admissibility, and recursive divide-and-conquer.</p>
+    <div class="algo-pill-list">
+      <a href="/puzzles?puzzle=wumpus" class="algo-pill">5. Wumpus World (Knowledge Base)</a>
+      <a href="/puzzles?puzzle=eight_puzzle" class="algo-pill">6. 8 Puzzle Problem (A*)</a>
+      <a href="/puzzles?puzzle=hanoi" class="algo-pill">7. Towers of Hanoi (Recursive)</a>
+    </div>
+    <a href="/puzzles" class="btn-pill" style="margin-top:auto; font-size:0.8rem;">Explore Group 2 →</a>
+  </div>
+
+  <!-- Group 3 -->
+  <div class="group-card">
+    <span class="group-badge badge-3">GROUP 3</span>
+    <h4>Informed Search & Optimization</h4>
+    <p>Heuristic-guided navigation and dynamic replanning in static and changing environments, alongside gradient ascent.</p>
+    <div class="algo-pill-list">
+      <a href="/algorithms?id=a_star" class="algo-pill">8. A* Search Algorithm</a>
+      <a href="/algorithms?id=d_star" class="algo-pill">9. D* Dynamic Replanning</a>
+      <a href="/algorithms?id=hill_climbing" class="algo-pill">10. Hill Climbing Algorithm</a>
+    </div>
+    <a href="/algorithms?id=a_star" class="btn-pill" style="margin-top:auto; font-size:0.8rem;">Explore Group 3 →</a>
+  </div>
+
+  <!-- Group 4 -->
+  <div class="group-card">
+    <span class="group-badge badge-4">GROUP 4</span>
+    <h4>Probabilistic Artificial Intelligence</h4>
+    <p>Reasoning under uncertainty, latent variable clustering with missing data, and temporal sequential hidden state decoding.</p>
+    <div class="algo-pill-list">
+      <a href="/algorithms?id=bayesian_network" class="algo-pill">11. Bayesian Network (Rain/Sprinkler)</a>
+      <a href="/algorithms?id=em_algorithm" class="algo-pill">12. Expectation Maximization (GMM)</a>
+      <a href="/algorithms?id=hidden_markov_model" class="algo-pill">13. Hidden Markov Model (Viterbi)</a>
+    </div>
+    <a href="/algorithms?id=bayesian_network" class="btn-pill" style="margin-top:auto; font-size:0.8rem;">Explore Group 4 →</a>
+  </div>
+</div>
+
+<!-- Quick Demonstrations Directory Table -->
+<div class="section-header">
+  <h3>⚡ Quick Demonstration Hub</h3>
+  <span style="font-size:0.82rem; color:var(--text-muted);">Instant 1-click execution</span>
+</div>
+
+<div style="background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:14px; overflow:hidden;">
+  <table style="width:100%; border-collapse:collapse; font-size:0.88rem; text-align:left;">
+    <thead>
+      <tr style="background:rgba(7,10,19,0.7); border-bottom:1px solid var(--border-subtle); color:var(--text-muted); font-size:0.75rem; text-transform:uppercase;">
+        <th style="padding:1rem;">#</th>
+        <th style="padding:1rem;">Algorithm</th>
+        <th style="padding:1rem;">Category</th>
+        <th style="padding:1rem;">Core Complexity</th>
+        <th style="padding:1rem;">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid var(--border-subtle);">
+        <td style="padding:0.9rem 1rem; color:var(--accent-cyan);">01</td>
+        <td style="padding:0.9rem 1rem;"><b>Depth First Search (DFS)</b></td>
+        <td style="padding:0.9rem 1rem;"><span class="group-badge badge-1">Search</span></td>
+        <td style="padding:0.9rem 1rem; font-family:monospace;">Time: O(b^m) | Space: O(bm)</td>
+        <td style="padding:0.9rem 1rem;"><a href="/algorithms?id=dfs" class="btn-pill btn-primary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">Simulate</a></td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border-subtle);">
+        <td style="padding:0.9rem 1rem; color:var(--accent-cyan);">02</td>
+        <td style="padding:0.9rem 1rem;"><b>Breadth First Search (BFS)</b></td>
+        <td style="padding:0.9rem 1rem;"><span class="group-badge badge-1">Search</span></td>
+        <td style="padding:0.9rem 1rem; font-family:monospace;">Time: O(b^d) | Space: O(b^d)</td>
+        <td style="padding:0.9rem 1rem;"><a href="/algorithms?id=bfs" class="btn-pill btn-primary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">Simulate</a></td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border-subtle);">
+        <td style="padding:0.9rem 1rem; color:var(--accent-cyan);">05</td>
+        <td style="padding:0.9rem 1rem;"><b>Wumpus World Problem</b></td>
+        <td style="padding:0.9rem 1rem;"><span class="group-badge badge-2">Puzzles</span></td>
+        <td style="padding:0.9rem 1rem; font-family:monospace;">Propositional Logic KB</td>
+        <td style="padding:0.9rem 1rem;"><a href="/puzzles?puzzle=wumpus" class="btn-pill btn-primary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">Play Grid</a></td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border-subtle);">
+        <td style="padding:0.9rem 1rem; color:var(--accent-cyan);">06</td>
+        <td style="padding:0.9rem 1rem;"><b>8 Puzzle Problem</b></td>
+        <td style="padding:0.9rem 1rem;"><span class="group-badge badge-2">Puzzles</span></td>
+        <td style="padding:0.9rem 1rem; font-family:monospace;">A* Manhattan Distance</td>
+        <td style="padding:0.9rem 1rem;"><a href="/puzzles?puzzle=eight_puzzle" class="btn-pill btn-primary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">Solve Tile</a></td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border-subtle);">
+        <td style="padding:0.9rem 1rem; color:var(--accent-cyan);">08</td>
+        <td style="padding:0.9rem 1rem;"><b>A* Search Algorithm</b></td>
+        <td style="padding:0.9rem 1rem;"><span class="group-badge badge-3">Informed</span></td>
+        <td style="padding:0.9rem 1rem; font-family:monospace;">f(n) = g(n) + h(n)</td>
+        <td style="padding:0.9rem 1rem;"><a href="/algorithms?id=a_star" class="btn-pill btn-primary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">Run A*</a></td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border-subtle);">
+        <td style="padding:0.9rem 1rem; color:var(--accent-cyan);">11</td>
+        <td style="padding:0.9rem 1rem;"><b>Bayesian Network</b></td>
+        <td style="padding:0.9rem 1rem;"><span class="group-badge badge-4">Probabilistic</span></td>
+        <td style="padding:0.9rem 1rem; font-family:monospace;">Exact Bayes Enumeration</td>
+        <td style="padding:0.9rem 1rem;"><a href="/algorithms?id=bayesian_network" class="btn-pill btn-primary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">Infer CPT</a></td>
+      </tr>
+      <tr>
+        <td style="padding:0.9rem 1rem; color:var(--accent-cyan);">13</td>
+        <td style="padding:0.9rem 1rem;"><b>Hidden Markov Model (HMM)</b></td>
+        <td style="padding:0.9rem 1rem;"><span class="group-badge badge-4">Probabilistic</span></td>
+        <td style="padding:0.9rem 1rem; font-family:monospace;">Viterbi O(T * N^2)</td>
+        <td style="padding:0.9rem 1rem;"><a href="/algorithms?id=hidden_markov_model" class="btn-pill btn-primary" style="padding:0.3rem 0.75rem; font-size:0.75rem;">Decode</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}

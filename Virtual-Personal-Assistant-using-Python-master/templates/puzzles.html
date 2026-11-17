@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h3>🧩 Classical AI Benchmark Puzzles</h3>
+    <span style="font-size:0.85rem; color:var(--text-muted);">
+      Interactive laboratory for Wumpus World (Knowledge Base Logic), 8-Puzzle (A* Manhattan), and Towers of Hanoi (Recursion).
+    </span>
+  </div>
+  <div style="display:flex; gap:0.5rem;">
+    <button class="btn-pill {% if selected_puzzle == 'wumpus' %}btn-primary{% endif %}" onclick="switchPuzzleTab('wumpus')">
+      🏰 Wumpus World
+    </button>
+    <button class="btn-pill {% if selected_puzzle == 'eight_puzzle' %}btn-primary{% endif %}" onclick="switchPuzzleTab('eight_puzzle')">
+      🔢 8-Puzzle
+    </button>
+    <button class="btn-pill {% if selected_puzzle == 'hanoi' %}btn-primary{% endif %}" onclick="switchPuzzleTab('hanoi')">
+      🗼 Towers of Hanoi
+    </button>
+  </div>
+</div>
+
+<!-- ===================================================================
+     1. WUMPUS WORLD TAB
+     =================================================================== -->
+<div id="tabWumpus" class="puzzle-tab-content" style="display:{% if selected_puzzle == 'wumpus' %}block{% else %}none{% endif %};">
+  <div class="lab-layout">
+    <aside class="lab-sidebar">
+      <div class="lab-title">Wumpus World Controls</div>
+      <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.45;">
+        Navigate a partially observable 4x4 world containing hazards (Pits, Wumpus) and Gold using Propositional Logic inference.
+      </p>
+
+      <button class="btn-execute" onclick="runWumpusAutonomous()">
+        🤖 Run Autonomous AI Agent
+      </button>
+
+      <div style="font-size:0.75rem; color:var(--text-muted); border-top:1px solid var(--border-subtle); padding-top:0.75rem;">
+        <b>Percept Legend:</b><br>
+        💨 <b>Breeze:</b> Pit in adjacent cell<br>
+        🦨 <b>Stench:</b> Wumpus in adjacent cell<br>
+        ✨ <b>Glitter:</b> Gold in current square
+      </div>
+    </aside>
+
+    <section class="visualizer-board">
+      <div class="board-header">
+        <h3>Wumpus World Simulation</h3>
+        <div style="display:flex; gap:0.5rem;" id="wumpusControls">
+          <button class="btn-pill" onclick="wumpusHandler.stepPrev()">⏮️ Prev</button>
+          <button class="btn-pill" onclick="wumpusHandler.play()">▶️ Play</button>
+          <button class="btn-pill" onclick="wumpusHandler.stepNext()">⏭️ Next</button>
+          <button class="btn-pill" onclick="wumpusHandler.reset()">🔄 Reset</button>
+        </div>
+      </div>
+
+      <div id="wumpusContainer" style="min-height:380px; display:flex; align-items:center; justify-content:center;">
+        <span style="color:#64748b;">Click "Run Autonomous AI Agent" to begin simulation.</span>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ===================================================================
+     2. 8-PUZZLE TAB
+     =================================================================== -->
+<div id="tabEightPuzzle" class="puzzle-tab-content" style="display:{% if selected_puzzle == 'eight_puzzle' %}block{% else %}none{% endif %};">
+  <div class="lab-layout">
+    <aside class="lab-sidebar">
+      <div class="lab-title">8-Puzzle Solver</div>
+      
+      <div class="form-group">
+        <label>Heuristic Evaluation</label>
+        <select class="form-select" id="puzzleHeuristic">
+          <option value="manhattan" selected>Manhattan Distance</option>
+          <option value="misplaced">Misplaced Tiles Count</option>
+        </select>
+      </div>
+
+      <div style="display:flex; gap:0.5rem;">
+        <button class="btn-pill" onclick="loadSolvablePreset()" style="flex:1; font-size:0.78rem;">
+          🎲 Solvable Preset
+        </button>
+        <button class="btn-pill" onclick="loadUnsolvablePreset()" style="flex:1; font-size:0.78rem;">
+          ⚠️ Unsolvable
+        </button>
+      </div>
+
+      <button class="btn-execute" onclick="solveEightPuzzle()">
+        🧩 Solve with A* Search
+      </button>
+
+      <div id="solvabilityStatus" style="font-size:0.78rem; padding:0.6rem; border-radius:6px; background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle);">
+        Solvability Check: Ready
+      </div>
+    </aside>
+
+    <section class="visualizer-board">
+      <div class="board-header">
+        <h3>8-Puzzle Solution Player</h3>
+        <div style="display:flex; gap:0.5rem;" id="eightPuzzleControls">
+          <button class="btn-pill" onclick="eightPuzzleHandler.stepPrev()">⏮️ Prev</button>
+          <button class="btn-pill" onclick="eightPuzzleHandler.play()">▶️ Play</button>
+          <button class="btn-pill" onclick="eightPuzzleHandler.stepNext()">⏭️ Next</button>
+          <button class="btn-pill" onclick="eightPuzzleHandler.reset()">🔄 Reset</button>
+        </div>
+      </div>
+
+      <div id="eightPuzzleContainer" style="min-height:360px; display:flex; align-items:center; justify-content:center;">
+        <span style="color:#64748b;">Load a configuration and click "Solve with A* Search".</span>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ===================================================================
+     3. TOWERS OF HANOI TAB
+     =================================================================== -->
+<div id="tabHanoi" class="puzzle-tab-content" style="display:{% if selected_puzzle == 'hanoi' %}block{% else %}none{% endif %};">
+  <div class="lab-layout">
+    <aside class="lab-sidebar">
+      <div class="lab-title">Towers of Hanoi</div>
+
+      <div class="form-group">
+        <label>Number of Disks (N): <span id="hanoiNVal">3</span></label>
+        <input type="range" class="form-range" id="hanoiDisksInput" min="2" max="6" value="3" oninput="document.getElementById('hanoiNVal').innerText = this.value">
+      </div>
+
+      <button class="btn-execute" onclick="solveHanoi()">
+        🗼 Solve Recursively
+      </button>
+
+      <div style="font-size:0.78rem; color:var(--text-muted); line-height:1.45; border-top:1px solid var(--border-subtle); padding-top:0.75rem;">
+        <b>Theoretical Proof:</b><br>
+        Recurrence: T(n) = 2T(n-1) + 1<br>
+        Min Moves: 2^n - 1<br>
+        Optimal path is guaranteed by mathematical induction.
+      </div>
+    </aside>
+
+    <section class="visualizer-board">
+      <div class="board-header">
+        <h3>Towers of Hanoi Animation</h3>
+        <div style="display:flex; gap:0.5rem;" id="hanoiControls">
+          <button class="btn-pill" onclick="hanoiHandler.stepPrev()">⏮️ Prev</button>
+          <button class="btn-pill" onclick="hanoiHandler.play()">▶️ Play</button>
+          <button class="btn-pill" onclick="hanoiHandler.stepNext()">⏭️ Next</button>
+          <button class="btn-pill" onclick="hanoiHandler.reset()">🔄 Reset</button>
+        </div>
+      </div>
+
+      <div id="hanoiContainer" style="min-height:360px; display:flex; align-items:center; justify-content:center;">
+        <span style="color:#64748b;">Select number of disks and click "Solve Recursively".</span>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let wumpusHandler = null;
+let eightPuzzleHandler = null;
+let hanoiHandler = null;
+let customBoardState = null;
+
+function switchPuzzleTab(puzzleId) {
+  document.querySelectorAll(".puzzle-tab-content").forEach(el => el.style.display = "none");
+  if (puzzleId === "wumpus") {
+    document.getElementById("tabWumpus").style.display = "block";
+    if (!wumpusHandler) runWumpusAutonomous();
+  } else if (puzzleId === "eight_puzzle") {
+    document.getElementById("tabEightPuzzle").style.display = "block";
+    if (!eightPuzzleHandler) solveEightPuzzle();
+  } else if (puzzleId === "hanoi") {
+    document.getElementById("tabHanoi").style.display = "block";
+    if (!hanoiHandler) solveHanoi();
+  }
+}
+
+// 1. Wumpus World Handler
+async function runWumpusAutonomous() {
+  try {
+    const res = await fetch("/api/run_algorithm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ algorithm_id: "wumpus_world" })
+    });
+    const data = await res.json();
+    if (data.status === "success" && data.result) {
+      wumpusHandler = VisualizerEngine.renderWumpusWorld("wumpusContainer", data.result);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// 2. 8-Puzzle Handlers
+function loadSolvablePreset() {
+  customBoardState = [[1, 2, 3], [4, 0, 6], [7, 5, 8]];
+  solveEightPuzzle();
+}
+
+function loadUnsolvablePreset() {
+  customBoardState = [[1, 2, 3], [4, 5, 6], [8, 7, 0]];
+  solveEightPuzzle();
+}
+
+async function solveEightPuzzle() {
+  const heuristic = document.getElementById("puzzleHeuristic").value;
+  const statusEl = document.getElementById("solvabilityStatus");
+  statusEl.innerHTML = "Computing A* solution...";
+
+  try {
+    const res = await fetch("/api/run_algorithm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        algorithm_id: "eight_puzzle",
+        params: { board: customBoardState, heuristic: heuristic }
+      })
+    });
+    const data = await res.json();
+    const result = data.result;
+
+    if (result.success) {
+      statusEl.innerHTML = `
+        <span style="color:#10b981; font-weight:bold;">✓ Solvable!</span> Inversion Count: <b>${result.inversion_count} (Even)</b><br>
+        Moves: <b>${result.total_moves}</b> | Nodes Explored: <b>${result.nodes_explored}</b>
+      `;
+      eightPuzzleHandler = VisualizerEngine.renderEightPuzzle("eightPuzzleContainer", result.steps);
+    } else {
+      statusEl.innerHTML = `
+        <span style="color:#f43f5e; font-weight:bold;">✗ Unsolvable!</span> Inversion Count: <b>${result.inversion_count} (Odd)</b><br>
+        ${result.error}
+      `;
+      document.getElementById("eightPuzzleContainer").innerHTML = `
+        <div style="text-align:center; color:#f43f5e; padding:2rem;">
+          <h4>⚠️ Mathematically Unsolvable State</h4>
+          <p style="font-size:0.85rem; color:#94a3b8; max-width:400px; margin:0.5rem auto;">
+            Odd inversion count (${result.inversion_count}). According to sliding tile parity theorem, half of all permutations cannot reach standard goal.
+          </p>
+        </div>
+      `;
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// 3. Hanoi Handler
+async function solveHanoi() {
+  const n = parseInt(document.getElementById("hanoiDisksInput").value);
+  try {
+    const res = await fetch("/api/run_algorithm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        algorithm_id: "towers_of_hanoi",
+        params: { num_disks: n }
+      })
+    });
+    const data = await res.json();
+    if (data.status === "success" && data.result) {
+      hanoiHandler = VisualizerEngine.renderTowersOfHanoi("hanoiContainer", data.result.steps, n);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const initial = "{{ selected_puzzle }}" || "wumpus";
+  switchPuzzleTab(initial);
+});
+</script>
+{% endblock %}

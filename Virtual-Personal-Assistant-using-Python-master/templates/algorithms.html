@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h3>⚡ Interactive Algorithm Laboratory</h3>
+    <span style="font-size:0.85rem; color:var(--text-muted);">
+      Select an algorithm, adjust hyperparameters, execute simulation, and examine step-by-step visualizations.
+    </span>
+  </div>
+</div>
+
+<div class="lab-layout">
+  <!-- Left Control Sidebar -->
+  <aside class="lab-sidebar">
+    <div class="lab-title">Algorithm Configuration</div>
+
+    <div class="form-group">
+      <label>Select Algorithm</label>
+      <select class="form-select" id="algoSelector" onchange="onAlgorithmSelect(this.value)">
+        <optgroup label="Group 1: Search & Optimization">
+          <option value="dfs" {% if selected_algo == 'dfs' %}selected{% endif %}>1. Depth First Search (DFS)</option>
+          <option value="bfs" {% if selected_algo == 'bfs' %}selected{% endif %}>2. Breadth First Search (BFS)</option>
+          <option value="ids" {% if selected_algo == 'ids' %}selected{% endif %}>3. Iterative Deepening Search (IDS)</option>
+          <option value="simulated_annealing" {% if selected_algo == 'simulated_annealing' %}selected{% endif %}>4. Simulated Annealing (TSP)</option>
+        </optgroup>
+        <optgroup label="Group 3: Informed Search & Optimization">
+          <option value="a_star" {% if selected_algo == 'a_star' %}selected{% endif %}>8. A* Search Algorithm</option>
+          <option value="d_star" {% if selected_algo == 'd_star' %}selected{% endif %}>9. D* Dynamic Replanning</option>
+          <option value="hill_climbing" {% if selected_algo == 'hill_climbing' %}selected{% endif %}>10. Hill Climbing Algorithm</option>
+        </optgroup>
+        <optgroup label="Group 4: Probabilistic Artificial Intelligence">
+          <option value="bayesian_network" {% if selected_algo == 'bayesian_network' %}selected{% endif %}>11. Bayesian Network (Rain/Sprinkler)</option>
+          <option value="em_algorithm" {% if selected_algo == 'em_algorithm' %}selected{% endif %}>12. Expectation Maximization (GMM)</option>
+          <option value="hidden_markov_model" {% if selected_algo == 'hidden_markov_model' %}selected{% endif %}>13. Hidden Markov Model (Viterbi & Forward)</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <!-- Dynamic Parameter Controls Container -->
+    <div id="dynamicParamsContainer">
+      <!-- Injected dynamically based on selected algorithm -->
+    </div>
+
+    <button class="btn-execute" id="btnRunAlgo" onclick="executeCurrentAlgorithm()">
+      ▶️ Run Algorithm
+    </button>
+
+    <div style="font-size:0.75rem; color:var(--text-muted); line-height:1.45; border-top:1px solid var(--border-subtle); padding-top:0.75rem;">
+      💡 Tip: All algorithms run in native Python using real computational graphs and mathematical proofs.
+    </div>
+  </aside>
+
+  <!-- Right Visualizer & Output Board -->
+  <section class="visualizer-board">
+    <div class="board-header">
+      <div>
+        <h3 id="boardAlgoTitle">Algorithm Visualizer</h3>
+        <span id="boardAlgoCategory" style="font-size:0.78rem; color:var(--accent-cyan);">Ready for execution</span>
+      </div>
+      <div class="board-metrics" id="boardMetrics">
+        <!-- Execution time, visited nodes, and path cost chips -->
+      </div>
+    </div>
+
+    <!-- Visualizer Canvas / Stage Area -->
+    <div class="canvas-container" id="visualizerStage">
+      <canvas id="mainCanvas"></canvas>
+    </div>
+
+    <!-- Step Trace / Exploration Log -->
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">
+        Execution Trace & Reasoning Output
+      </span>
+      <div id="playbackControls" style="display:none; gap:0.5rem;">
+        <button class="btn-pill" style="padding:0.25rem 0.6rem; font-size:0.75rem;" onclick="playbackHandler.play()">▶️ Animate</button>
+        <button class="btn-pill" style="padding:0.25rem 0.6rem; font-size:0.75rem;" onclick="playbackHandler.showFull()">⏩ Show All</button>
+      </div>
+    </div>
+
+    <div class="steps-feed" id="stepsFeed">
+      <div style="color:#64748b;">Select an algorithm on the left and click "Run Algorithm" to generate step-by-step traces.</div>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentResult = null;
+let playbackHandler = null;
+
+const initialAlgo = "{{ selected_algo }}" || "bfs";
+
+function onAlgorithmSelect(algoId) {
+  const container = document.getElementById("dynamicParamsContainer");
+  let html = "";
+
+  if (["dfs", "bfs", "ids"].includes(algoId)) {
+    html = `
+      <div class="form-group" style="margin-bottom:0.8rem;">
+        <label>Start Node</label>
+        <select class="form-select" id="paramStart">
+          <option value="A" selected>Node A (Root)</option>
+          <option value="B">Node B</option>
+          <option value="C">Node C</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0.8rem;">
+        <label>Goal Node</label>
+        <select class="form-select" id="paramGoal">
+          <option value="J" selected>Node J (Target)</option>
+          <option value="H">Node H</option>
+          <option value="K">Node K</option>
+          <option value="L">Node L</option>
+        </select>
+      </div>
+    `;
+    if (algoId === "ids") {
+      html += `
+        <div class="form-group" style="margin-bottom:0.8rem;">
+          <label>Max Depth Limit: <span id="depthVal">8</span></label>
+          <input type="range" class="form-range" id="paramMaxDepth" min="1" max="10" value="8" oninput="document.getElementById('depthVal').innerText = this.value">
+        </div>
+      `;
+    }
+  } else if (algoId === "simulated_annealing") {
+    html = `
+      <div class="form-group" style="margin-bottom:0.8rem;">
+        <label>Initial Temperature (T0): <span id="t0Val">1000</span></label>
+        <input type="range" class="form-range" id="paramT0" min="200" max="2500" step="100" value="1000" oninput="document.getElementById('t0Val').innerText = this.value">
+      </div>
+      <div class="form-group" style="margin-bottom:0.8rem;">
+        <label>Cooling Rate (alpha): <span id="alphaVal">0.95</span></label>
+        <input type="range" class="form-range" id="paramAlpha" min="0.80" max="0.99" step="0.01" value="0.95" oninput="document.getElementById('alphaVal').innerText = this.value">
+      </div>
+    `;
+  } else if (algoId === "a_star") {
+    html = `
+      <div class="form-group" style="margin-bottom:0.8rem;">
+        <label>Heuristic Function</label>
+        <select class="form-select" id="paramHeuristic">
+          <option value="manhattan" selected>Manhattan Distance |x1-x2| + |y1-y2|</option>
+          <option value="euclidean">Euclidean Distance sqrt(dx^2 + dy^2)</option>
+        </select>
+      </div>
+    `;
+  } else if (algoId === "d_star") {
+    html = `
+      <div style="font-size:0.8rem; color:#94a3b8; margin-bottom:0.8rem;">
+        Simulates dynamic obstacle appearing at cell (5,1) on planned route. D* replans locally.
+      </div>
+    `;
+  } else if (algoId === "hill_climbing") {
+    html = `
+      <div class="form-group" style="margin-bottom:0.8rem;">
+        <label>Climbing Variant</label>
+        <select class="form-select" id="paramVariant">
+          <option value="steepest" selected>Steepest Ascent Hill Climbing</option>
+          <option value="simple">Simple Hill Climbing (First Choice)</option>
+          <option value="random_restart">Random-Restart Hill Climbing</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0.8rem;">
+        <label>Starting Coordinate X: <span id="startXVal">1.5</span></label>
+        <input type="range" class="form-range" id="paramStartX" min="0.5" max="11.5" step="0.5" value="1.5" oninput="document.getElementById('startXVal').innerText = this.value">
+      </div>
+    `;
+  } else if (algoId === "bayesian_network") {
+    html = `
+      <div class="form-group" style="margin-bottom:0.8rem;">
+        <label>Query Variable</label>
+        <select class="form-select" id="paramQueryVar">
+          <option value="Rain" selected>P(Rain | Evidence)</option>
+          <option value="Cloudy">P(Cloudy | Evidence)</option>
+          <option value="Sprinkler">P(Sprinkler | Evidence)</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:0.8rem;">
+        <label>Observed Evidence</label>
+        <select class="form-select" id="paramEvidence">
+          <option value="wet_true" selected>WetGrass = True</option>
+          <option value="wet_true_sprink_false">WetGrass = True AND Sprinkler = False</option>
+          <option value="wet_true_cloudy_true">WetGrass = True AND Cloudy = True</option>
+        </select>
+      </div>
+    `;
+  } else if (algoId === "em_algorithm") {
+    html = `
+      <div class="form-group" style="margin-bottom:0.8rem;">
+        <label>Number of Clusters (K): <span id="kVal">2</span></label>
+        <input type="range" class="form-range" id="paramK" min="2" max="4" value="2" oninput="document.getElementById('kVal').innerText = this.value">
+      </div>
+    `;
+  } else if (algoId === "hidden_markov_model") {
+    html = `
+      <div class="form-group" style="margin-bottom:0.8rem;">
+        <label>Observation Sequence</label>
+        <select class="form-select" id="paramObs">
+          <option value="Walk,Shop,Clean" selected>Walk -> Shop -> Clean</option>
+          <option value="Clean,Clean,Shop">Clean -> Clean -> Shop</option>
+          <option value="Walk,Walk,Walk">Walk -> Walk -> Walk</option>
+        </select>
+      </div>
+    `;
+  }
+
+  container.innerHTML = html;
+}
+
+async function executeCurrentAlgorithm() {
+  const algoId = document.getElementById("algoSelector").value;
+  const btn = document.getElementById("btnRunAlgo");
+  btn.innerText = "⏳ Executing...";
+  btn.disabled = true;
+
+  // Build params payload
+  const params = {};
+  if (document.getElementById("paramStart")) params.start = document.getElementById("paramStart").value;
+  if (document.getElementById("paramGoal")) params.goal = document.getElementById("paramGoal").value;
+  if (document.getElementById("paramMaxDepth")) params.max_depth = parseInt(document.getElementById("paramMaxDepth").value);
+  if (document.getElementById("paramT0")) params.initial_temp = parseFloat(document.getElementById("paramT0").value);
+  if (document.getElementById("paramAlpha")) params.cooling_rate = parseFloat(document.getElementById("paramAlpha").value);
+  if (document.getElementById("paramHeuristic")) params.heuristic = document.getElementById("paramHeuristic").value;
+  if (document.getElementById("paramVariant")) params.variant = document.getElementById("paramVariant").value;
+  if (document.getElementById("paramStartX")) params.start_x = parseFloat(document.getElementById("paramStartX").value);
+  if (document.getElementById("paramK")) params.num_clusters = parseInt(document.getElementById("paramK").value);
+
+  if (document.getElementById("paramQueryVar")) params.query_var = document.getElementById("paramQueryVar").value;
+  if (document.getElementById("paramEvidence")) {
+    const ev = document.getElementById("paramEvidence").value;
+    if (ev === "wet_true") params.evidence = { "WetGrass": true };
+    else if (ev === "wet_true_sprink_false") params.evidence = { "WetGrass": true, "Sprinkler": false };
+    else if (ev === "wet_true_cloudy_true") params.evidence = { "WetGrass": true, "Cloudy": true };
+  }
+  if (document.getElementById("paramObs")) {
+    params.observations = document.getElementById("paramObs").value.split(",");
+  }
+
+  try {
+    const res = await fetch("/api/run_algorithm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ algorithm_id: algoId, params: params })
+    });
+    const data = await res.json();
+
+    if (data.status === "success" && data.result) {
+      currentResult = data.result;
+      renderAlgorithmOutput(algoId, currentResult);
+    } else {
+      alert("Algorithm execution error: " + (data.message || "Unknown error"));
+    }
+  } catch (err) {
+    alert("Execution error: " + err.message);
+  } finally {
+    btn.innerText = "▶️ Run Algorithm";
+    btn.disabled = false;
+  }
+}
+
+function renderAlgorithmOutput(algoId, res) {
+  const title = document.getElementById("boardAlgoTitle");
+  const metrics = document.getElementById("boardMetrics");
+  const feed = document.getElementById("stepsFeed");
+  const playbackControls = document.getElementById("playbackControls");
+
+  title.innerText = res.algorithm || algoId.toUpperCase();
+  playbackControls.style.display = "none";
+
+  // Render Metric Chips
+  let metricHtml = `<span class="metric-chip">Time: <b>${res.execution_time_ms} ms</b></span>`;
+  if (res.visited_count !== undefined) metricHtml += `<span class="metric-chip">Explored: <b>${res.visited_count} nodes</b></span>`;
+  if (res.path_length !== undefined) metricHtml += `<span class="metric-chip">Path Length: <b>${res.path_length} nodes</b></span>`;
+  if (res.path_cost !== undefined) metricHtml += `<span class="metric-chip">Cost: <b>${res.path_cost}</b></span>`;
+  if (res.best_cost !== undefined) metricHtml += `<span class="metric-chip">Optimal Cost: <b>${res.best_cost}</b></span>`;
+  if (res.status !== undefined) metricHtml += `<span class="metric-chip">Status: <b>${res.status}</b></span>`;
+  metrics.innerHTML = metricHtml;
+
+  // Render Visualizer & Step Feed based on algorithm family
+  if (["dfs", "bfs", "ids"].includes(algoId)) {
+    playbackControls.style.display = "flex";
+    playbackHandler = VisualizerEngine.renderGraphSearch("mainCanvas", res);
+
+    feed.innerHTML = (res.steps || []).map(s => `
+      <div class="step-item ${s.current === res.goal ? 'highlight':''}">
+        Step ${s.step}: <b>${s.action}</b> | Path so far: [${s.path_so_far.join(" → ")}]
+      </div>
+    `).join("");
+
+  } else if (algoId === "simulated_annealing") {
+    VisualizerEngine.renderLineChart("mainCanvas", [], res.energy_curve, "Energy (Tour Distance) Optimization Curve", "#10b981");
+
+    feed.innerHTML = (res.sample_history || []).map(h => `
+      <div class="step-item ${h.accepted ? 'highlight':''}">
+        Iteration ${h.iteration} | Temp: ${h.temperature} | Cost: ${h.current_cost} (Best: ${h.best_cost}) | ΔE: ${h.delta_e} | P(accept): ${h.prob} ${h.accepted ? '✓ ACCEPTED':'✗ REJECTED'}
+      </div>
+    `).join("");
+
+  } else if (algoId === "hill_climbing") {
+    VisualizerEngine.renderHillClimbingLandscape("mainCanvas", res);
+
+    feed.innerHTML = (res.steps || []).map(st => `
+      <div class="step-item ${st.step === res.total_steps ? 'highlight':''}">
+        Step ${st.step}: x = ${st.x}, f(x) = ${st.y} → <b>${st.action}</b>
+      </div>
+    `).join("");
+
+  } else if (["a_star", "d_star"].includes(algoId)) {
+    VisualizerEngine.renderGridPath("mainCanvas", res);
+
+    let html = `<div style="padding:0.4rem; color:#06b6d4; font-weight:bold;">Final Path: ${(res.path || res.full_final_path).map(p => `(${p[0]},${p[1]})`).join(" → ")}</div>`;
+    if (res.nodes_reused_explanation) {
+      html += `<div style="padding:0.4rem; color:#cbd5e1;">${res.nodes_reused_explanation}</div>`;
+    }
+    feed.innerHTML = html;
+
+  } else if (algoId === "bayesian_network") {
+    const stage = document.getElementById("visualizerStage");
+    const pTrue = res.percentage_true;
+    const pFalse = res.percentage_false;
+
+    stage.innerHTML = `
+      <div style="width:100%; padding:1.5rem;">
+        <h4 style="color:#06b6d4; margin-bottom:1rem;">Inference: P(${res.query}=True | ${JSON.stringify(res.evidence)})</h4>
+        <div style="display:flex; flex-direction:column; gap:1rem; max-width:550px;">
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;">
+              <span>P(${res.query} = True)</span>
+              <span style="font-weight:bold; color:#10b981;">${pTrue}% (${res.posterior_probabilities.True})</span>
+            </div>
+            <div style="height:14px; background:#1e293b; border-radius:7px; overflow:hidden;">
+              <div style="width:${pTrue}%; height:100%; background:linear-gradient(90deg,#06b6d4,#10b981);"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:4px;">
+              <span>P(${res.query} = False)</span>
+              <span style="font-weight:bold; color:#f43f5e;">${pFalse}% (${res.posterior_probabilities.False})</span>
+            </div>
+            <div style="height:14px; background:#1e293b; border-radius:7px; overflow:hidden;">
+              <div style="width:${pFalse}%; height:100%; background:linear-gradient(90deg,#f43f5e,#fb7185);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    feed.innerHTML = `
+      <div class="step-item highlight">Mathematical Formula: ${res.formula_derivation}</div>
+      <div class="step-item">Unnormalized numerator weights: True: ${res.unnormalized_weights.True}, False: ${res.unnormalized_weights.False}</div>
+    `;
+
+  } else if (algoId === "em_algorithm") {
+    VisualizerEngine.renderLineChart("mainCanvas", [], res.log_likelihood_history.map(l => l.log_likelihood), "EM Log-Likelihood Convergence Curve ln P(X|θ)", "#8b5cf6");
+
+    feed.innerHTML = `
+      <div class="step-item highlight">Converged in ${res.total_iterations} iterations with Log-Likelihood: ${res.log_likelihood_history[res.log_likelihood_history.length-1].log_likelihood}</div>
+      <div class="step-item">Estimated Cluster Means: ${JSON.stringify(res.final_parameters.means)}</div>
+      <div class="step-item">Estimated Cluster Variances: ${JSON.stringify(res.final_parameters.variances)}</div>
+      <div class="step-item">Estimated Mixture Weights: ${JSON.stringify(res.final_parameters.weights)}</div>
+    `;
+
+  } else if (algoId === "hidden_markov_model") {
+    const stage = document.getElementById("visualizerStage");
+    const viterbi = res.viterbi_decoding;
+
+    stage.innerHTML = `
+      <div style="width:100%; padding:1.5rem;">
+        <h4 style="color:#06b6d4; margin-bottom:0.75rem;">Most Likely Hidden States: [ ${viterbi.most_likely_states.join(" → ")} ]</h4>
+        <div style="font-size:0.85rem; color:#94a3b8; margin-bottom:1rem;">
+          Sequence Probability P(O|λ): <b>${res.forward_evaluation.total_observation_probability}</b> |
+          Viterbi Path Probability: <b>${viterbi.path_probability}</b>
+        </div>
+        <table style="width:100%; font-size:0.82rem; border-collapse:collapse; text-align:left;">
+          <tr style="border-bottom:1px solid #334155; color:#94a3b8;">
+            <th style="padding:6px;">Time Step</th>
+            <th style="padding:6px;">Observed</th>
+            <th style="padding:6px;">P(Sunny)</th>
+            <th style="padding:6px;">P(Rainy)</th>
+            <th style="padding:6px;">Viterbi Choice</th>
+          </tr>
+          ${viterbi.trellis_table.map((row, idx) => `
+            <tr style="border-bottom:1px solid rgba(148,163,184,0.1);">
+              <td style="padding:6px;">t = ${row.time}</td>
+              <td style="padding:6px; font-weight:bold; color:#f59e0b;">${row.observation}</td>
+              <td style="padding:6px;">${row.state_probs.Sunny}</td>
+              <td style="padding:6px;">${row.state_probs.Rainy}</td>
+              <td style="padding:6px; font-weight:bold; color:#06b6d4;">${viterbi.most_likely_states[idx]}</td>
+            </tr>
+          `).join("")}
+        </table>
+      </div>
+    `;
+
+    feed.innerHTML = `
+      <div class="step-item highlight">Input Observation Sequence: ${res.observations_input.join(" → ")}</div>
+      <div class="step-item">Viterbi Dynamic Programming Trellis Matrix Computed Successfully</div>
+    `;
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  onAlgorithmSelect(initialAlgo);
+  // Auto-execute default selected algorithm on page load
+  executeCurrentAlgorithm();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="section-header">
+  <div>
+    <h3>📚 Algorithm Theory & Viva Preparation Portal</h3>
+    <span style="font-size:0.85rem; color:var(--text-muted);">
+      Academic documentation, step-by-step working principles, pseudocode, complexities, and top viva Q&A for all 13 algorithms.
+    </span>
+  </div>
+</div>
+
+<div class="lab-layout" style="grid-template-columns: 290px 1fr;">
+  <!-- Sidebar of Algorithms -->
+  <aside class="lab-sidebar" style="max-height: calc(100vh - 160px); overflow-y:auto;">
+    <div class="lab-title">Algorithms Directory</div>
+    {% for algo_id, algo in all_algorithms.items() %}
+    <a href="/learning?id={{ algo_id }}" class="nav-link {% if selected_id == algo_id %}active{% endif %}" style="padding:0.6rem 0.8rem; font-size:0.84rem;">
+      <span>{{ algo.name }}</span>
+    </a>
+    {% endfor %}
+  </aside>
+
+  <!-- Algorithm Theory Viewer -->
+  <section class="visualizer-board" style="min-height:750px;">
+    {% set cur = all_algorithms.get(selected_id, all_algorithms['bfs']) %}
+    <div class="board-header">
+      <div>
+        <span class="group-badge badge-{{ cur.group_id }}">{{ cur.group }}</span>
+        <h3 style="margin-top:0.4rem;">{{ cur.name }}</h3>
+      </div>
+      <a href="/algorithms?id={{ cur.id }}" class="btn-pill btn-primary">
+        ⚡ Run Interactive Simulation
+      </a>
+    </div>
+
+    <!-- Section 1 & 2: Definition & Principle -->
+    <div style="margin-bottom:1.5rem;">
+      <h4 style="color:#06b6d4; font-size:1rem; margin-bottom:0.4rem;">1. Definition & Core Concept</h4>
+      <p style="font-size:0.9rem; line-height:1.6; color:#cbd5e1;">{{ cur.definition }}</p>
+    </div>
+
+    <div style="margin-bottom:1.5rem;">
+      <h4 style="color:#06b6d4; font-size:1rem; margin-bottom:0.4rem;">2. Working Principle</h4>
+      <p style="font-size:0.9rem; line-height:1.6; color:#cbd5e1;">{{ cur.working_principle }}</p>
+    </div>
+
+    <!-- Section 3: Step-by-Step Procedure -->
+    <div style="margin-bottom:1.5rem;">
+      <h4 style="color:#06b6d4; font-size:1rem; margin-bottom:0.6rem;">3. Step-by-Step Execution Procedure</h4>
+      <ol style="padding-left:1.5rem; font-size:0.88rem; line-height:1.65; color:#cbd5e1;">
+        {% for step in cur.steps %}
+        <li>{{ step }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+
+    <!-- Section 4: Pseudocode -->
+    <div style="margin-bottom:1.5rem;">
+      <h4 style="color:#06b6d4; font-size:1rem; margin-bottom:0.4rem;">4. Algorithm Pseudocode</h4>
+      <pre class="code-block"><code>{{ cur.pseudocode }}</code></pre>
+    </div>
+
+    <!-- Section 5: Complexities & Guarantees -->
+    <div style="margin-bottom:1.5rem;">
+      <h4 style="color:#06b6d4; font-size:1rem; margin-bottom:0.6rem;">5. Complexity Analysis & Optimality</h4>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:0.75rem;">
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); padding:0.85rem; border-radius:8px;">
+          <div style="font-size:0.75rem; color:var(--text-muted);">TIME COMPLEXITY</div>
+          <div style="font-size:0.95rem; font-weight:bold; color:#f59e0b; font-family:monospace; margin-top:4px;">{{ cur.time_complexity }}</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); padding:0.85rem; border-radius:8px;">
+          <div style="font-size:0.75rem; color:var(--text-muted);">SPACE COMPLEXITY</div>
+          <div style="font-size:0.95rem; font-weight:bold; color:#10b981; font-family:monospace; margin-top:4px;">{{ cur.space_complexity }}</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); padding:0.85rem; border-radius:8px;">
+          <div style="font-size:0.75rem; color:var(--text-muted);">OPTIMALITY</div>
+          <div style="font-size:0.85rem; color:#cbd5e1; margin-top:4px;">{{ cur.optimality }}</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border-subtle); padding:0.85rem; border-radius:8px;">
+          <div style="font-size:0.75rem; color:var(--text-muted);">COMPLETENESS</div>
+          <div style="font-size:0.85rem; color:#cbd5e1; margin-top:4px;">{{ cur.completeness }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 6: Advantages & Disadvantages -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-bottom:1.5rem;">
+      <div style="background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.25); border-radius:10px; padding:1.1rem;">
+        <h4 style="color:#10b981; font-size:0.95rem; margin-bottom:0.5rem;">✓ Advantages</h4>
+        <ul style="padding-left:1.2rem; font-size:0.85rem; line-height:1.55; color:#cbd5e1;">
+          {% for adv in cur.advantages %}
+          <li>{{ adv }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div style="background:rgba(244,63,94,0.06); border:1px solid rgba(244,63,94,0.25); border-radius:10px; padding:1.1rem;">
+        <h4 style="color:#f43f5e; font-size:0.95rem; margin-bottom:0.5rem;">✗ Disadvantages</h4>
+        <ul style="padding-left:1.2rem; font-size:0.85rem; line-height:1.55; color:#cbd5e1;">
+          {% for dis in cur.disadvantages %}
+          <li>{{ dis }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Section 7: Real-World Applications -->
+    <div style="margin-bottom:1.5rem;">
+      <h4 style="color:#06b6d4; font-size:1rem; margin-bottom:0.5rem;">6. Real-World Applications</h4>
+      <ul style="padding-left:1.3rem; font-size:0.88rem; line-height:1.6; color:#cbd5e1;">
+        {% for app in cur.applications %}
+        <li>{{ app }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Section 8: Important Viva Questions -->
+    <div style="margin-bottom:1.5rem;">
+      <h4 style="color:#f59e0b; font-size:1.05rem; margin-bottom:0.75rem;">🎓 Important Lab Viva Questions & Model Answers</h4>
+      <div style="display:flex; flex-direction:column; gap:0.75rem;">
+        {% for v in cur.viva_questions %}
+        <div class="viva-item">
+          <div class="viva-q">Q: {{ v.q }}</div>
+          <div class="viva-a"><b>Ans:</b> {{ v.a }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

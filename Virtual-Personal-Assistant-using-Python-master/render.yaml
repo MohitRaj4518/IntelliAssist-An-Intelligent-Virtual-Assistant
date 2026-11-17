@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: intelliassist-ai-assistant
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: USER
+        value: Student
+      - key: BOT_NAME
+        value: IntelliAssist
+      - key: PORT
+        value: 5050

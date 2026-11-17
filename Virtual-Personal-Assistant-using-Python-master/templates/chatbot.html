@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="chat-layout">
+  <!-- Left Commands & Shortcuts Panel -->
+  <aside class="chat-commands-panel">
+    <div style="font-size:0.82rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--accent-cyan); margin-bottom:0.4rem;">
+      Voice & Text Commands
+    </div>
+    <p style="font-size:0.75rem; color:var(--text-muted); line-height:1.45; margin-bottom:0.8rem;">
+      Click any command chip or click the microphone to speak naturally to <b class="bot-name-label">{{ bot_name }}</b>.
+    </p>
+
+    <div style="font-size:0.7rem; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:0.3rem;">Run Algorithms & Puzzles</div>
+    <div style="display:flex; flex-direction:column; gap:0.35rem;">
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Run BFS')">
+        ▶️ "Run BFS"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Run DFS')">
+        ▶️ "Run DFS"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Solve 8 puzzle')">
+        🧩 "Solve 8 puzzle"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Start Wumpus World')">
+        🏰 "Start Wumpus World"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Run A star')">
+        ⭐ "Run A star"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Show Bayesian Network')">
+        🎲 "Show Bayesian Network"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Run Simulated Annealing')">
+        🔥 "Run Simulated Annealing"
+      </button>
+    </div>
+
+    <div style="font-size:0.7rem; font-weight:700; color:#64748b; text-transform:uppercase; margin:0.6rem 0 0.3rem;">General Q&A & Math</div>
+    <div style="display:flex; flex-direction:column; gap:0.35rem;">
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Who is Albert Einstein')">
+        💡 "Who is Albert Einstein"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('What is Python')">
+        🐍 "What is Python"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('What is machine learning')">
+        🤖 "What is machine learning"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('What is 25 * 4')">
+        🧮 "What is 25 * 4"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Weather in Delhi')">
+        🌦️ "Weather in Delhi"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Tell me a joke')">
+        😂 "Tell me a joke"
+      </button>
+    </div>
+
+    <div style="font-size:0.7rem; font-weight:700; color:#64748b; text-transform:uppercase; margin:0.6rem 0 0.3rem;">Web & Chrome Launch</div>
+    <div style="display:flex; flex-direction:column; gap:0.35rem;">
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Open Github')">
+        🌐 "Open Github"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Search on Chrome for deep learning')">
+        🔍 "Search Chrome: deep learning"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Play lofi hip hop on youtube')">
+        🎵 "Play on YouTube"
+      </button>
+    </div>
+
+    <div style="font-size:0.7rem; font-weight:700; color:#64748b; text-transform:uppercase; margin:0.6rem 0 0.3rem;">Explain Theory</div>
+    <div style="display:flex; flex-direction:column; gap:0.35rem;">
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Explain A star')">
+        📖 "Explain A star"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Explain Hidden Markov Model')">
+        📖 "Explain HMM"
+      </button>
+      <button class="btn-pill" style="font-size:0.75rem; text-align:left; justify-content:flex-start;" onclick="sendChatMessage('Explain EM Algorithm')">
+        📖 "Explain EM Algorithm"
+      </button>
+    </div>
+
+    <div style="margin-top:auto; font-size:0.7rem; color:var(--text-dim); border-top:1px solid var(--border-subtle); padding-top:0.6rem;">
+      Powered by rule-based natural language understanding & Python AI modules.
+    </div>
+  </aside>
+
+  <!-- Right Chat Stream Container -->
+  <section class="chat-panel-container">
+    <div class="chat-history" id="chatHistory">
+      <!-- Initial Greeting -->
+      <div class="chat-bubble bot-bubble">
+        <div class="bubble-author bot-name-label">{{ bot_name }}</div>
+        <div>
+          Hello! I am <b>{{ bot_name }}</b>, your intelligent virtual assistant for this B.Tech Artificial Intelligence Lab project.<br><br>
+          I can execute and explain all 13 algorithms in your syllabus. You can type commands or click the 🎙️ microphone icon to speak. Try: <em>"Run BFS"</em>, <em>"Explain A star"</em>, or <em>"Solve 8 puzzle"</em>!
+        </div>
+        <div class="bubble-time">Just now</div>
+      </div>
+    </div>
+
+    <!-- Chat Input Dock -->
+    <div class="chat-input-dock">
+      <button class="mic-toggle-btn" onclick="toggleSpeechListening()" title="Click to speak">
+        🎙️
+      </button>
+      <input 
+        type="text" 
+        class="chat-text-input" 
+        id="chatInput" 
+        placeholder="Ask ANY question (e.g. 'Who is Albert Einstein', 'What is Python', 'Run BFS', 'Open Github', 'Weather in Delhi')..." 
+        autocomplete="off"
+      />
+      <button class="chat-send-btn" id="chatSendBtn" title="Send message">
+        ➤
+      </button>
+    </div>
+  </section>
+</div>
+{% endblock %}

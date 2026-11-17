@@ -1,0 +1,4 @@
+# Optional dependencies for local desktop microphone/speaker CLI mode
+-r requirements.txt
+pyttsx3>=2.90
+SpeechRecognition>=3.10.0

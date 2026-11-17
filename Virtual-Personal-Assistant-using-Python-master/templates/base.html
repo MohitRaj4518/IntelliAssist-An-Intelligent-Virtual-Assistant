@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ project_title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <script>
+    window.APP_BOT_NAME = "{{ bot_name }}";
+    window.APP_VOICE_NAME = "{{ voice_name }}";
+    window.APP_VOICE_PITCH = {{ voice_pitch }};
+    window.APP_VOICE_RATE = {{ voice_rate }};
+  </script>
+</head>
+<body>
+
+  <!-- Left Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-icon">🧠</div>
+      <div class="brand-info">
+        <h1 class="bot-name-label">{{ bot_name }}</h1>
+        <span>AI Lab Project</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-menu">
+      <span class="menu-section-title">Navigation</span>
+      <a href="/" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="/algorithms" class="nav-link {% if active_page == 'algorithms' %}active{% endif %}">
+        <span class="nav-icon">⚡</span> Algorithm Lab
+        <span class="nav-badge">10 Algos</span>
+      </a>
+      <a href="/puzzles" class="nav-link {% if active_page == 'puzzles' %}active{% endif %}">
+        <span class="nav-icon">🧩</span> Classical AI Puzzles
+        <span class="nav-badge">3 Puzzles</span>
+      </a>
+      <a href="/learning" class="nav-link {% if active_page == 'learning' %}active{% endif %}">
+        <span class="nav-icon">📚</span> Theory & Viva Q&A
+        <span class="nav-badge">Full Syllabus</span>
+      </a>
+      <a href="/chatbot" class="nav-link {% if active_page == 'chatbot' %}active{% endif %}">
+        <span class="nav-icon">🤖</span> Virtual Assistant
+        <span class="nav-badge">Voice + AI</span>
+      </a>
+
+      <span class="menu-section-title">AI Syllabus Groups</span>
+      <a href="/algorithms?id=dfs" class="nav-link">
+        <span class="nav-icon">🔍</span> Search Algorithms
+      </a>
+      <a href="/puzzles?puzzle=wumpus" class="nav-link">
+        <span class="nav-icon">🏰</span> Classical AI Problems
+      </a>
+      <a href="/algorithms?id=a_star" class="nav-link">
+        <span class="nav-icon">⭐</span> Informed Optimization
+      </a>
+      <a href="/algorithms?id=bayesian_network" class="nav-link">
+        <span class="nav-icon">🎲</span> Probabilistic AI
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="assistant-status">
+        <span class="pulse-dot"></span>
+        <span>Engine Active (13 Algos)</span>
+      </div>
+      <button class="btn-pill" onclick="openSettingsModal()" title="Voice & Settings">⚙️</button>
+    </div>
+  </aside>
+
+  <!-- Main Content Layout -->
+  <div class="app-container">
+    <!-- Top Navbar -->
+    <header class="top-navbar">
+      <div class="navbar-title">
+        <h2>{{ project_title }}</h2>
+        <span>B.Tech Artificial Intelligence Lab Mini-Project</span>
+      </div>
+      <div class="navbar-actions">
+        <button class="btn-pill active" id="speechToggleBtn" onclick="toggleSpeechAudio()">
+          🔊 Voice: <b>ON</b>
+        </button>
+        <button class="btn-pill" onclick="openSettingsModal()">
+          ⚙️ Voice & Name
+        </button>
+        <a href="/chatbot" class="btn-pill btn-primary">
+          💬 Talk to Assistant
+        </a>
+      </div>
+    </header>
+
+    <!-- Injected Page Content -->
+    <main class="main-content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <!-- Settings & Voice Customization Modal -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>⚙️ Assistant Voice & Identity Settings</h3>
+        <button class="btn-close" onclick="closeSettingsModal()">&times;</button>
+      </div>
+      <div class="form-group" style="margin-bottom:1rem;">
+        <label>Assistant Identity Name</label>
+        <input type="text" class="form-control" id="settingBotName" value="{{ bot_name }}" placeholder="e.g. IntelliAssist, Athena, Friday">
+      </div>
+      <div class="form-group" style="margin-bottom:1rem;">
+        <label>Speech Synthesizer Voice</label>
+        <select class="form-select" id="voiceSelect">
+          <option value="{{ voice_name }}">{{ voice_name }} (Default)</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:1rem;">
+        <label>Voice Pitch: <span id="pitchDisplay">1.1</span></label>
+        <input type="range" class="form-range" id="settingPitch" min="0.5" max="1.6" step="0.05" value="{{ voice_pitch }}" oninput="document.getElementById('pitchDisplay').innerText = this.value">
+      </div>
+      <div class="form-group" style="margin-bottom:1.5rem;">
+        <label>Voice Speech Rate: <span id="rateDisplay">1.05</span></label>
+        <input type="range" class="form-range" id="settingRate" min="0.7" max="1.5" step="0.05" value="{{ voice_rate }}" oninput="document.getElementById('rateDisplay').innerText = this.value">
+      </div>
+      <div style="display:flex; justify-content:space-between; gap:1rem;">
+        <button class="btn-pill" onclick="testAssistantVoice()">🔊 Test Voice</button>
+        <button class="btn-pill btn-primary" onclick="saveAssistantSettings()">💾 Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/visualizers.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
