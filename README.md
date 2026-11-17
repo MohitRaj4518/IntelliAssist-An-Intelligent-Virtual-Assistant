@@ -13,7 +13,8 @@
 ---
 
 ## 📌 Project Overview
-
+ DEMO LINK : 
+https://intelliassist-an-intelligent-virtual-sdb8.onrender.com
 **IntelliAssist** is an intelligent, full-stack virtual assistant and educational simulation platform built to demonstrate, analyze, and visualize all **13 classical Artificial Intelligence algorithms** from the university AI Lab syllabus. 
 
 Unlike generic chatbots, **IntelliAssist** features real computational algorithm engines written in Python, dynamic step-by-step Canvas/DOM visualizers, and a localized virtual assistant supporting browser-native speech recognition and speech synthesis.
